@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+
+def get_args():
+    import argparse
+    parser = argparse.ArgumentParser(
+        description='Push the current git branch',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        )
+    return parser.parse_args()
+
+import subprocess
+
+def current_branch():
+    proc = subprocess.Popen(
+        ['git', 'branch'],
+        stdout = subprocess.PIPE,
+        );
+    stdout, stderr = proc.communicate()
+    stdout = stdout.decode('utf-8')
+    if stderr is not None:
+        stderr = stderr.decode('utf-8')
+    assert not stderr, stderr
+    lines = stdout.split('\n')
+    current_branch_line = [line for line in lines
+                           if line.startswith('* ')][0]
+    branch = current_branch_line.strip().split('* ')[-1]
+    return branch
+
+def push_cmd(branch):
+    return [
+        'git',
+        'push',
+        '-u',
+        'origin',
+        branch,
+        ]
+
+def pp_cmd(cmd):
+    return ' '.join(cmd)
+
+def run_cmd(cmd):
+    proc = subprocess.Popen(cmd)
+    proc.wait()
+
+def verify(branch):
+    prompt = '*Really* push branch "{}"? '.format(branch)
+    try:
+        resp = input(prompt)
+    except KeyboardInterrupt:
+        return False
+    return resp.strip().lower().startswith('y')
+    
+if __name__ == '__main__':
+    args = get_args()
+    branch = current_branch()
+    cmd = push_cmd(branch)
+    ok = verify(branch)
+    if ok:
+        print('Running command:\n  ' + pp_cmd(cmd))
+        run_cmd(cmd)
