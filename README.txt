@@ -21,3 +21,11 @@ git-push-branch automates this. It determines the current branch, and
 pushes it to the remote. By default it asks you to verify the branch
 before pushing (to make sure you are pushing to where you think you
 are).
+
+LICENSE
+
+This software is in the public domain.
+
+AUTHOR
+
+Aaron Maxwell - amax AT redsymbol DOT net
