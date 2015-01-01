@@ -6,6 +6,9 @@ def get_args():
     parser = argparse.ArgumentParser(
         description='Push the current git branch',
         formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''Return code is 0 on success, or nonzero if the refs are not pushed
+to the remote (for any reason).
+'''
         )
     parser.add_argument('-f', '--force', default=False, action='store_true',
                     help='Do not verify with prompt - just push')
@@ -43,7 +46,7 @@ def pp_cmd(cmd):
 
 def run_cmd(cmd):
     proc = subprocess.Popen(cmd)
-    proc.wait()
+    return proc.wait()
 
 def verify(branch):
     prompt = '*Really* push branch "{}"? '.format(branch)
@@ -60,6 +63,7 @@ if __name__ == '__main__':
     ok_to_proceed = args.force or verify(branch)
     if ok_to_proceed:
         print('Running command:\n  ' + pp_cmd(cmd))
-        run_cmd(cmd)
+        retcode = run_cmd(cmd)
     else:
-        sys.exit(1)
+        retcode = 1
+    sys.exit(retcode)
