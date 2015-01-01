@@ -6,6 +6,8 @@ def get_args():
         description='Push the current git branch',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         )
+    parser.add_argument('-f', '--force', default=False, action='store_true',
+                    help='Do not verify with prompt - just push')
     return parser.parse_args()
 
 import subprocess
@@ -54,7 +56,7 @@ if __name__ == '__main__':
     args = get_args()
     branch = current_branch()
     cmd = push_cmd(branch)
-    ok = verify(branch)
-    if ok:
+    ok_to_proceed = args.force or verify(branch)
+    if ok_to_proceed:
         print('Running command:\n  ' + pp_cmd(cmd))
         run_cmd(cmd)
